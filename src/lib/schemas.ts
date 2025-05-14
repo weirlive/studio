@@ -75,15 +75,15 @@ export const networkObjectSchema = z.discriminatedUnion("objectType", [
 export type NetworkObjectFormData = z.infer<typeof networkObjectSchema>;
 
 
-// Schema for Subnet Calculator
-export const subnetCalculatorSchema = z.object({
-  ipAddress: z.string().refine(isIPv4, {
-    message: "Invalid IPv4 address format (e.g., 192.168.1.1).",
-  }),
-  cidr: z.coerce // coerce allows string input to be converted to number
-    .number({ invalid_type_error: "CIDR must be a number." })
-    .min(0, { message: "CIDR prefix must be between 0 and 32." })
-    .max(32, { message: "CIDR prefix must be between 0 and 32." }),
-});
+// Schema for Subnet Calculator (Removed)
+// export const subnetCalculatorSchema = z.object({
+//   ipAddress: z.string().refine(isIPv4, {
+//     message: "Invalid IPv4 address format (e.g., 192.168.1.1).",
+//   }),
+//   cidr: z.coerce // coerce allows string input to be converted to number
+//     .number({ invalid_type_error: "CIDR must be a number." })
+//     .min(0, { message: "CIDR prefix must be between 0 and 32." })
+//     .max(32, { message: "CIDR prefix must be between 0 and 32." }),
+// });
 
-export type SubnetCalculatorFormData = z.infer<typeof subnetCalculatorSchema>;
+// export type SubnetCalculatorFormData = z.infer<typeof subnetCalculatorSchema>; // Removed

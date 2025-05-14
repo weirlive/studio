@@ -1,13 +1,13 @@
 
 import type { PropsWithChildren } from 'react';
 import Link from 'next/link';
-import { Home, Aperture, ChevronDown, Calculator } from 'lucide-react'; // Added Calculator
+import { Home, Aperture, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator, // Added Separator
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
@@ -49,13 +49,7 @@ export function AppLayout({ children }: PropsWithChildren) {
                     Network Object Creator
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-primary-foreground/20" />
-                <DropdownMenuItem asChild>
-                  <Link href="/apps/subnet-calculator" className="cursor-pointer hover:!bg-primary-foreground/10 focus:!bg-primary-foreground/10 flex items-center gap-2">
-                    <Calculator size={16} />
-                    Subnet Calculator
-                  </Link>
-                </DropdownMenuItem>
+                {/* Subnet Calculator link removed */}
                 {/* Add more DropdownMenuItems here for other apps in the future */}
               </DropdownMenuContent>
             </DropdownMenu>

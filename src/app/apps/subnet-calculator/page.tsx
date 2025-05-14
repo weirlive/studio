@@ -1,13 +1,2 @@
-
-import { AppLayout } from "@/components/layout/app-layout";
-import { SubnetCalculatorForm } from "@/components/subnet-calculator-form";
-
-export default function SubnetCalculatorPage() {
-  return (
-    <AppLayout>
-      <div className="w-full">
-        <SubnetCalculatorForm />
-      </div>
-    </AppLayout>
-  );
-}
+// This file is being removed as part of the Subnet Calculator app deletion.
+// The build system will handle its deletion.
