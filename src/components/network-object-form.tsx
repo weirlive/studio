@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { networkObjectSchema } from '@/lib/schemas';
-// import { suggestObjectName } from '@/ai/flows/suggest-object-name'; // Removed import
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,11 +14,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Download, Loader2 } from 'lucide-react'; // Removed Sparkles
+import { Download, Loader2 } from 'lucide-react';
 
 export function NetworkObjectForm() {
   const [isSubmittingConfig, setIsSubmittingConfig] = useState(false);
-  // Removed aiDescription and isSuggestingName states
   const { toast } = useToast();
 
   const form = useForm<NetworkObjectFormData>({
@@ -33,27 +31,36 @@ export function NetworkObjectForm() {
     },
   });
 
-  // Removed handleSuggestName function
-
   const onSubmit = (data: NetworkObjectFormData) => {
     setIsSubmittingConfig(true);
     let configLines: string[] = [];
     const ipValue = data.ipAddress;
 
-    if (ipValue.includes('-')) { // Validated by Zod to be a proper range if it contains '-'
-      configLines.push(`set address ${data.name} ip-range ${ipValue}`);
-    } else { // Single IP or CIDR
-      configLines.push(`set address ${data.name} ip-netmask ${ipValue}`);
+    let ipForNameSuffix: string;
+    if (ipValue.includes('-')) { // Range
+      ipForNameSuffix = ipValue.substring(0, ipValue.indexOf('-'));
+    } else if (ipValue.includes('/')) { // CIDR
+      ipForNameSuffix = ipValue.substring(0, ipValue.indexOf('/'));
+    } else { // Single IP
+      ipForNameSuffix = ipValue;
+    }
+    const processedIpSuffix = ipForNameSuffix.replace(/\./g, '-');
+    const finalObjectName = `${data.name}-${processedIpSuffix}`;
+
+    if (ipValue.includes('-')) { 
+      configLines.push(`set address ${finalObjectName} ip-range ${ipValue}`);
+    } else { 
+      configLines.push(`set address ${finalObjectName} ip-netmask ${ipValue}`);
     }
     
     if (data.description) {
-      configLines.push(`set address ${data.name} description "${data.description.replace(/"/g, '\\"')}"`);
+      configLines.push(`set address ${finalObjectName} description "${data.description.replace(/"/g, '\\"')}"`);
     }
     if (data.tag) {
-      configLines.push(`set address ${data.name} tag ${data.tag}`);
+      configLines.push(`set address ${finalObjectName} tag ${data.tag}`);
     }
-    if (data.objectGroup && data.name) {
-      configLines.push(`set address-group ${data.objectGroup} static add [ ${data.name} ]`);
+    if (data.objectGroup && finalObjectName) {
+      configLines.push(`set address-group ${data.objectGroup} static add [ ${finalObjectName} ]`);
     }
 
     const fullConfig = configLines.join('\n');
@@ -63,7 +70,7 @@ export function NetworkObjectForm() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${data.name || 'network_object'}_config.txt`;
+      link.download = `${finalObjectName || 'network_object'}_config.txt`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -90,7 +97,7 @@ export function NetworkObjectForm() {
       <CardHeader>
         <CardTitle className="text-2xl">Define Network Object</CardTitle>
         <CardDescription>
-          Enter the details for your Palo Alto Networks object.
+          Enter the details for your Palo Alto Networks object. The IP address will be appended to the name.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -101,16 +108,17 @@ export function NetworkObjectForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Object Name</FormLabel>
+                  <FormLabel>Base Object Name</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., web-server-prod-01" {...field} />
                   </FormControl>
+                  <FormDescription>
+                    The IP address details will be automatically appended to this name (e.g., name-192-168-1-1).
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Removed Smart Name Suggestion section */}
             
             <Separator />
 
