@@ -174,7 +174,11 @@ export function NetworkObjectForm() {
                 <FormItem>
                   <FormLabel>Zone</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., dmz, trust, untrust" {...field} />
+                    <Input 
+                      placeholder="e.g., DMZ, TRUST, UNTRUST" 
+                      {...field} 
+                      onChange={(e) => field.onChange(e.target.value.toUpperCase())} 
+                    />
                   </FormControl>
                   <FormDescription>The firewall zone for this object (used in naming).</FormDescription>
                   <FormMessage />
@@ -287,7 +291,11 @@ export function NetworkObjectForm() {
                 <FormItem>
                   <FormLabel>Description (Optional)</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="A brief description of the object's purpose." {...field} />
+                    <Textarea 
+                      placeholder="A BRIEF DESCRIPTION OF THE OBJECT'S PURPOSE." 
+                      {...field} 
+                      onChange={(e) => field.onChange(e.target.value.toUpperCase())} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -300,7 +308,11 @@ export function NetworkObjectForm() {
                 <FormItem>
                   <FormLabel>Tag (Optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Prod, PCI, Web" {...field} />
+                    <Input 
+                      placeholder="e.g., PROD, PCI, WEB" 
+                      {...field} 
+                      onChange={(e) => field.onChange(e.target.value.toUpperCase())} 
+                    />
                   </FormControl>
                    <FormDescription>
                     Assign a tag for organization and policy matching.
@@ -316,7 +328,11 @@ export function NetworkObjectForm() {
                 <FormItem>
                   <FormLabel>Add to Object Group (Optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Internal-Servers-Group" {...field} />
+                    <Input 
+                      placeholder="e.g., INTERNAL-SERVERS-GROUP" 
+                      {...field} 
+                      onChange={(e) => field.onChange(e.target.value.toUpperCase())} 
+                    />
                   </FormControl>
                   <FormDescription>
                     Specify an address group to add this object to. The group must already exist on the firewall.
