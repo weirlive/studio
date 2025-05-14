@@ -45,7 +45,7 @@ export function NetworkObjectForm() {
       ipForNameSuffix = ipValue;
     }
     const processedIpSuffix = ipForNameSuffix.replace(/\./g, '-');
-    const finalObjectName = `${data.name}-${processedIpSuffix}`;
+    const finalObjectName = `${data.name}_${processedIpSuffix}`;
 
     if (ipValue.includes('-')) { 
       configLines.push(`set address ${finalObjectName} ip-range ${ipValue}`);
@@ -113,7 +113,7 @@ export function NetworkObjectForm() {
                     <Input placeholder="e.g., web-server-prod-01" {...field} />
                   </FormControl>
                   <FormDescription>
-                    The IP address details will be automatically appended to this name (e.g., name-192-168-1-1).
+                    The IP address details will be automatically appended to this name (e.g., name_192-168-1-1).
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
