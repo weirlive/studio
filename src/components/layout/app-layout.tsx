@@ -1,6 +1,5 @@
 
 import type { PropsWithChildren } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Home, Aperture } from 'lucide-react';
 
@@ -10,14 +9,6 @@ export function AppLayout({ children }: PropsWithChildren) {
       <header className="bg-primary text-primary-foreground shadow-md">
         <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="https://placehold.co/40x40.png"
-              alt="PANW Logo"
-              width={40}
-              height={40}
-              className="rounded-sm"
-              data-ai-hint="cat logo"
-            />
             <h1 className="text-xl font-semibold">PANW Network Object Creator</h1>
           </Link>
           <nav className="flex items-center gap-4 md:gap-6">
