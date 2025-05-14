@@ -6,23 +6,8 @@ import { Network } from 'lucide-react';
 export function AppLayout({ children }: PropsWithChildren) {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="bg-primary text-primary-foreground sticky top-0 z-50 shadow-md">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-          <div className="flex items-center gap-3">
-            <Image 
-              src="https://placehold.co/40x40.png" 
-              alt="PANW Logo" 
-              width={40} 
-              height={40} 
-              className="rounded-full"
-              data-ai-hint="PANW logo"
-            />
-            <h1 className="text-2xl font-bold tracking-tight">PANW Network Object Creator</h1>
-          </div>
-          {/* Placeholder for potential future nav items or user profile */}
-        </div>
-      </header>
-      <main className="flex-grow container mx-auto px-4 py-12 md:px-6"> {/* Increased py-8 to py-12 */}
+      {/* Header removed */}
+      <main className="flex-grow container mx-auto px-4 py-12 md:px-6">
         {children}
       </main>
       <footer className="py-6 md:px-6 md:py-0 border-t">
