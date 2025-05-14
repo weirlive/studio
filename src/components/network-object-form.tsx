@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { networkObjectSchema } from '@/lib/schemas';
-import { suggestObjectName } from '@/ai/flows/suggest-object-name';
+// import { suggestObjectName } from '@/ai/flows/suggest-object-name'; // Removed import
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,12 +15,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Sparkles, Download, Loader2 } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react'; // Removed Sparkles
 
 export function NetworkObjectForm() {
   const [isSubmittingConfig, setIsSubmittingConfig] = useState(false);
-  const [aiDescription, setAiDescription] = useState('');
-  const [isSuggestingName, setIsSuggestingName] = useState(false);
+  // Removed aiDescription and isSuggestingName states
   const { toast } = useToast();
 
   const form = useForm<NetworkObjectFormData>({
@@ -34,34 +33,7 @@ export function NetworkObjectForm() {
     },
   });
 
-  const handleSuggestName = async () => {
-    if (!aiDescription.trim()) {
-      toast({
-        title: 'Missing Information',
-        description: 'Please enter a description for AI name suggestion.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    setIsSuggestingName(true);
-    try {
-      const result = await suggestObjectName({ description: aiDescription });
-      form.setValue('name', result.suggestedName, { shouldValidate: true });
-      toast({
-        title: 'Name Suggested!',
-        description: `AI suggested: ${result.suggestedName}`,
-      });
-    } catch (error) {
-      console.error('Error suggesting name:', error);
-      toast({
-        title: 'Error Suggesting Name',
-        description: error instanceof Error ? error.message : 'An unknown error occurred.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSuggestingName(false);
-    }
-  };
+  // Removed handleSuggestName function
 
   const onSubmit = (data: NetworkObjectFormData) => {
     setIsSubmittingConfig(true);
@@ -81,8 +53,6 @@ export function NetworkObjectForm() {
       configLines.push(`set address ${data.name} tag ${data.tag}`);
     }
     if (data.objectGroup && data.name) {
-      // Note: Palo Alto CLI typically requires the group to exist or be created in the same transaction.
-      // This command adds an existing object to an existing group.
       configLines.push(`set address-group ${data.objectGroup} static add [ ${data.name} ]`);
     }
 
@@ -140,29 +110,7 @@ export function NetworkObjectForm() {
               )}
             />
 
-            <div className="space-y-2 pt-2 pb-4">
-              <FormLabel htmlFor="aiDescription">Smart Name Suggestion (Optional)</FormLabel>
-              <div className="flex items-center gap-2">
-                <Input 
-                  id="aiDescription"
-                  placeholder="Describe the object, e.g., 'Primary DNS server for guest network'" 
-                  value={aiDescription}
-                  onChange={(e) => setAiDescription(e.target.value)}
-                  className="flex-grow"
-                />
-                <Button type="button" variant="outline" onClick={handleSuggestName} disabled={isSuggestingName}>
-                  {isSuggestingName ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="mr-2 h-4 w-4" />
-                  )}
-                  Suggest
-                </Button>
-              </div>
-               <FormDescription>
-                Let AI help you pick a descriptive name based on its purpose.
-              </FormDescription>
-            </div>
+            {/* Removed Smart Name Suggestion section */}
             
             <Separator />
 
