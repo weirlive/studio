@@ -10,13 +10,13 @@ export function AppLayout({ children }: PropsWithChildren) {
           <div className="flex items-center gap-3">
             <Image 
               src="https://placehold.co/40x40.png" 
-              alt="Funny Cat Logo" 
+              alt="Cat Logo" 
               width={40} 
               height={40} 
               className="rounded-full"
               data-ai-hint="cat"
             />
-            <h1 className="text-2xl font-bold tracking-tight">NetGen Palo</h1>
+            <h1 className="text-2xl font-bold tracking-tight">PANW Network Object Creator</h1>
           </div>
           {/* Placeholder for potential future nav items or user profile */}
         </div>
@@ -27,7 +27,7 @@ export function AppLayout({ children }: PropsWithChildren) {
       <footer className="py-6 md:px-6 md:py-0 border-t">
         <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
            <p className="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
-            © {new Date().getFullYear()} NetGen Palo. Built with fun and GenAI.
+            © {new Date().getFullYear()} PANW Network Object Creator. Built with fun and GenAI.
           </p>
         </div>
       </footer>

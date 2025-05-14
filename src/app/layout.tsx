@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 // const geistMono = GeistMono; // Removed
 
 export const metadata: Metadata = {
-  title: 'NetGen Palo',
+  title: 'PANW Network Object Creator',
   description: 'Network Object Configuration Generator for Palo Alto Networks',
 };
 
