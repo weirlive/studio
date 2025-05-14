@@ -55,11 +55,11 @@ export function NetworkObjectForm() {
         return;
       }
 
-      downloadFileNamePrefix += `_${ips[0].replace(/\./g, '-').replace(/:/g, '_')}`;
+      downloadFileNamePrefix += `_HST_${ips[0].replace(/\./g, '-').replace(/:/g, '_')}`;
 
       ips.forEach(ip => {
         const ipSuffix = ip.replace(/\./g, '-').replace(/:/g, '_');
-        const objectName = `${data.zone}_${ipSuffix}`;
+        const objectName = `${data.zone}_HST_${ipSuffix}`;
         generatedObjectNames.push(objectName);
 
         if (objectName.length > 63) {
@@ -80,9 +80,9 @@ export function NetworkObjectForm() {
       });
     } else if (data.objectType === 'range' && data.ipRange) {
       const valueSuffix = data.ipRange.split('-')[0].replace(/\./g, '-').replace(/:/g, '_');
-      const objectName = `${data.zone}_${valueSuffix}`;
+      const objectName = `${data.zone}_ADR_${valueSuffix}`;
       generatedObjectNames.push(objectName);
-      downloadFileNamePrefix += `_${valueSuffix}`;
+      downloadFileNamePrefix += `_ADR_${valueSuffix}`;
 
       if (objectName.length > 63) {
           toast({
@@ -101,9 +101,9 @@ export function NetworkObjectForm() {
       }
     } else if (data.objectType === 'fqdn' && data.fqdn) {
       const valueSuffix = data.fqdn.replace(/\./g, '-');
-      const objectName = `${data.zone}_${valueSuffix}`;
+      const objectName = `${data.zone}_FQDN_${valueSuffix}`;
       generatedObjectNames.push(objectName);
-      downloadFileNamePrefix += `_${valueSuffix}`;
+      downloadFileNamePrefix += `_FQDN_${valueSuffix}`;
       
       if (objectName.length > 63) {
           toast({
@@ -161,7 +161,7 @@ export function NetworkObjectForm() {
       <CardHeader>
         <CardTitle className="text-2xl">Define Network Object</CardTitle>
         <CardDescription>
-          Enter details for your Palo Alto Networks object. The final name will be: Zone_IP/FQDNSuffix.
+          Enter details for your Palo Alto Networks object. The final name will be: ZONE_TYPE_IP/FQDNSuffix (e.g., DMZ_HST_1-1-1-1).
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -175,7 +175,7 @@ export function NetworkObjectForm() {
                   <FormLabel>Zone</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="e.g., DMZ, TRUST, UNTRUST" 
+                      placeholder="E.G., DMZ, TRUST, UNTRUST" 
                       {...field} 
                       onChange={(e) => field.onChange(e.target.value.toUpperCase())} 
                     />
@@ -309,7 +309,7 @@ export function NetworkObjectForm() {
                   <FormLabel>Tag (Optional)</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="e.g., PROD, PCI, WEB" 
+                      placeholder="E.G., PROD, PCI, WEB" 
                       {...field} 
                       onChange={(e) => field.onChange(e.target.value.toUpperCase())} 
                     />
@@ -329,7 +329,7 @@ export function NetworkObjectForm() {
                   <FormLabel>Add to Object Group (Optional)</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="e.g., INTERNAL-SERVERS-GROUP" 
+                      placeholder="E.G., INTERNAL-SERVERS-GROUP" 
                       {...field} 
                       onChange={(e) => field.onChange(e.target.value.toUpperCase())} 
                     />
@@ -362,3 +362,4 @@ export function NetworkObjectForm() {
     </Card>
   );
 }
+
