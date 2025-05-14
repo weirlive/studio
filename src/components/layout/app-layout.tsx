@@ -1,12 +1,13 @@
 
 import type { PropsWithChildren } from 'react';
 import Link from 'next/link';
-import { Home, Aperture, ChevronDown } from 'lucide-react';
+import { Home, Aperture, ChevronDown, Calculator } from 'lucide-react'; // Added Calculator
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator, // Added Separator
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
@@ -34,10 +35,25 @@ export function AppLayout({ children }: PropsWithChildren) {
                   <ChevronDown size={16} className="ml-1" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-primary text-primary-foreground border-primary-foreground/20">
+              <DropdownMenuContent align="end" className="bg-primary text-primary-foreground border-primary-foreground/20 w-56">
                 <DropdownMenuItem asChild>
-                  <Link href="/apps" className="cursor-pointer hover:!bg-primary-foreground/10 focus:!bg-primary-foreground/10">
+                  <Link href="/apps" className="cursor-pointer hover:!bg-primary-foreground/10 focus:!bg-primary-foreground/10 flex items-center gap-2">
+                    {/* Using an inline SVG for a generic network icon as an example, replace if you have a specific one */}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="16" y="16" width="6" height="6" rx="1"></rect>
+                      <rect x="2" y="16" width="6" height="6" rx="1"></rect>
+                      <rect x="9" y="2" width="6" height="6" rx="1"></rect>
+                      <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"></path>
+                      <path d="M12 12V8"></path>
+                    </svg>
                     Network Object Creator
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-primary-foreground/20" />
+                <DropdownMenuItem asChild>
+                  <Link href="/apps/subnet-calculator" className="cursor-pointer hover:!bg-primary-foreground/10 focus:!bg-primary-foreground/10 flex items-center gap-2">
+                    <Calculator size={16} />
+                    Subnet Calculator
                   </Link>
                 </DropdownMenuItem>
                 {/* Add more DropdownMenuItems here for other apps in the future */}
@@ -51,7 +67,7 @@ export function AppLayout({ children }: PropsWithChildren) {
       </main>
       <footer className="bg-secondary text-secondary-foreground py-6">
         <div className="container mx-auto px-4 md:px-6 text-center text-sm">
-          © {new Date().getFullYear()} PANW Network Object Creator. All rights reserved.
+          © {new Date().getFullYear()} WeirLive. All rights reserved.
         </div>
       </footer>
     </div>

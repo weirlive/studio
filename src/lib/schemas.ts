@@ -1,8 +1,8 @@
 
 import { z } from 'zod';
 
-// Helper function to check if a string is a valid IPv4 or IPv6
-const isIp = (value: string): boolean => z.string().ip().safeParse(value).success;
+// Helper function to check if a string is a valid IPv4
+const isIPv4 = (value: string): boolean => z.string().ip({ version: "v4" }).safeParse(value).success;
 
 // Helper function to check if a string is a valid IP range
 const isIpRange = (value: string): boolean => {
@@ -11,19 +11,15 @@ const isIpRange = (value: string): boolean => {
   if (parts.length !== 2) return false;
   const startIp = parts[0];
   const endIp = parts[1];
-  return isIp(startIp) && isIp(endIp);
+  return isIPv4(startIp) && isIPv4(endIp); // Changed to isIPv4
 };
 
 // Helper function to check if a string is a valid FQDN
 const isFqdn = (value: string): boolean => {
   if (!value || value.length === 0 || value.length > 253) return false;
-  // Basic FQDN regex: labels separated by dots, LDH rule (letters, digits, hyphen)
-  // No leading/trailing hyphens in labels. Labels 1-63 chars.
   const fqdnRegex = /^(?!-)(?!.*--)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63}(?<!-))*$/;
   if (!fqdnRegex.test(value)) return false;
-  // Ensure it's not an IP address
-  if (isIp(value)) return false;
-  // Check TLD presence
+  if (isIPv4(value)) return false; // Changed to isIPv4
   const labels = value.split('.');
   if (labels.length < 2 || labels[labels.length -1].length < 2) return false;
   return true;
@@ -57,12 +53,11 @@ export const networkObjectSchema = z.discriminatedUnion("objectType", [
       .refine(
         (value) => {
           if (!value) return false;
-          // Split by commas or one or more whitespace characters, then trim and filter empty strings
           const ips = value.split(/[\s,]+/).map(ip => ip.trim()).filter(ip => ip.length > 0);
-          if (ips.length === 0) return false; // Ensure at least one IP after processing
-          return ips.every(ip => isIp(ip));
+          if (ips.length === 0) return false;
+          return ips.every(ip => isIPv4(ip)); // Changed to isIPv4
         },
-        { message: "Invalid IP address format. Please provide valid IPv4 or IPv6 addresses, separated by commas or spaces (e.g., 1.1.1.1 2.2.2.2 or 1.1.1.1,2.2.2.2)." }
+        { message: "Invalid IP address format. Please provide valid IPv4 addresses, separated by commas or spaces (e.g., 1.1.1.1 2.2.2.2 or 1.1.1.1,2.2.2.2)." }
       ),
   }),
   z.object({
@@ -78,3 +73,17 @@ export const networkObjectSchema = z.discriminatedUnion("objectType", [
 ]);
 
 export type NetworkObjectFormData = z.infer<typeof networkObjectSchema>;
+
+
+// Schema for Subnet Calculator
+export const subnetCalculatorSchema = z.object({
+  ipAddress: z.string().refine(isIPv4, {
+    message: "Invalid IPv4 address format (e.g., 192.168.1.1).",
+  }),
+  cidr: z.coerce // coerce allows string input to be converted to number
+    .number({ invalid_type_error: "CIDR must be a number." })
+    .min(0, { message: "CIDR prefix must be between 0 and 32." })
+    .max(32, { message: "CIDR prefix must be between 0 and 32." }),
+});
+
+export type SubnetCalculatorFormData = z.infer<typeof subnetCalculatorSchema>;
