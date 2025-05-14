@@ -1,3 +1,12 @@
-export default function Home() {
-  return <></>;
+import { AppLayout } from "@/components/layout/app-layout";
+import { NetworkObjectForm } from "@/components/network-object-form";
+
+export default function HomePage() {
+  return (
+    <AppLayout>
+      <div className="w-full">
+        <NetworkObjectForm />
+      </div>
+    </AppLayout>
+  );
 }
