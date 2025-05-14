@@ -1,3 +1,4 @@
+
 import type { PropsWithChildren } from 'react';
 import Image from 'next/image';
 import { Network } from 'lucide-react';
@@ -10,11 +11,11 @@ export function AppLayout({ children }: PropsWithChildren) {
           <div className="flex items-center gap-3">
             <Image 
               src="https://placehold.co/40x40.png" 
-              alt="Cat Logo" 
+              alt="PANW Logo" 
               width={40} 
               height={40} 
               className="rounded-full"
-              data-ai-hint="cat"
+              data-ai-hint="PANW logo"
             />
             <h1 className="text-2xl font-bold tracking-tight">PANW Network Object Creator</h1>
           </div>
