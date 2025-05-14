@@ -1,7 +1,14 @@
 
 import type { PropsWithChildren } from 'react';
 import Link from 'next/link';
-import { Home, Aperture } from 'lucide-react';
+import { Home, Aperture, ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export function AppLayout({ children }: PropsWithChildren) {
   return (
@@ -16,10 +23,26 @@ export function AppLayout({ children }: PropsWithChildren) {
               <Home size={16} />
               Home
             </Link>
-            <Link href="/apps" className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-1">
-              <Aperture size={16} />
-              Apps
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-1 px-0 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                >
+                  <Aperture size={16} />
+                  Apps
+                  <ChevronDown size={16} className="ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-primary text-primary-foreground border-primary-foreground/20">
+                <DropdownMenuItem asChild>
+                  <Link href="/apps" className="cursor-pointer hover:!bg-primary-foreground/10 focus:!bg-primary-foreground/10">
+                    Network Object Creator
+                  </Link>
+                </DropdownMenuItem>
+                {/* Add more DropdownMenuItems here for other apps in the future */}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
         </div>
       </header>
