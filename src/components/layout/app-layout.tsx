@@ -1,7 +1,7 @@
 
 import type { PropsWithChildren } from 'react';
 import Link from 'next/link';
-import { Home, Aperture, ChevronDown } from 'lucide-react';
+import { Home, PawPrint, ChevronDown } from 'lucide-react'; // Changed TreePine to PawPrint
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import Image from 'next/image';
 
 export function AppLayout({ children }: PropsWithChildren) {
   return (
@@ -17,6 +18,17 @@ export function AppLayout({ children }: PropsWithChildren) {
       <header className="bg-primary text-primary-foreground shadow-md">
         <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
+            {/* Cat logo placeholder */}
+            {/* 
+            <Image 
+              src="https://placehold.co/40x40.png" 
+              alt="PANW logo" 
+              width={32} 
+              height={32} 
+              className="h-8 w-8 rounded-sm"
+              data-ai-hint="cat" 
+            />
+            */}
             <h1 className="text-xl font-semibold">WeirLive</h1>
           </Link>
           <nav className="flex items-center gap-4 md:gap-6">
@@ -30,7 +42,7 @@ export function AppLayout({ children }: PropsWithChildren) {
                   variant="ghost"
                   className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-1 px-0 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                 >
-                  <Aperture size={16} />
+                  <PawPrint size={16} /> {/* Changed TreePine to PawPrint */}
                   Apps
                   <ChevronDown size={16} className="ml-1" />
                 </Button>
@@ -49,7 +61,6 @@ export function AppLayout({ children }: PropsWithChildren) {
                     Network Object Creator
                   </Link>
                 </DropdownMenuItem>
-                {/* Subnet Calculator link removed */}
                 {/* Add more DropdownMenuItems here for other apps in the future */}
               </DropdownMenuContent>
             </DropdownMenu>
