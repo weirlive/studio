@@ -14,7 +14,7 @@ export function AppLayout({ children }: PropsWithChildren) {
               width={40} 
               height={40} 
               className="rounded-full"
-              data-ai-hint="funny cat"
+              data-ai-hint="cat"
             />
             <h1 className="text-2xl font-bold tracking-tight">NetGen Palo</h1>
           </div>
