@@ -55,10 +55,10 @@ export function NetworkObjectForm() {
         return;
       }
 
-      downloadFileNamePrefix += `_HST_${ips[0].replace(/\./g, '-').replace(/:/g, '_')}`;
+      downloadFileNamePrefix += `_HST_${ips[0].replace(/:/g, '_')}`; // Keep dots for IPv4, replace colons for IPv6
 
       ips.forEach(ip => {
-        const ipSuffix = ip.replace(/\./g, '-').replace(/:/g, '_');
+        const ipSuffix = ip.replace(/:/g, '_'); // Keep dots for IPv4, replace colons for IPv6
         const objectName = `${data.zone}_HST_${ipSuffix}`;
         generatedObjectNames.push(objectName);
 
@@ -79,7 +79,7 @@ export function NetworkObjectForm() {
         }
       });
     } else if (data.objectType === 'range' && data.ipRange) {
-      const valueSuffix = data.ipRange.split('-')[0].replace(/\./g, '-').replace(/:/g, '_');
+      const valueSuffix = data.ipRange.split('-')[0].replace(/:/g, '_'); // Keep dots for IPv4, replace colons for IPv6
       const objectName = `${data.zone}_ADR_${valueSuffix}`;
       generatedObjectNames.push(objectName);
       downloadFileNamePrefix += `_ADR_${valueSuffix}`;
@@ -100,7 +100,7 @@ export function NetworkObjectForm() {
         configLines.push(`set address ${objectName} tag ${data.tag}`);
       }
     } else if (data.objectType === 'fqdn' && data.fqdn) {
-      const valueSuffix = data.fqdn.replace(/\./g, '-');
+      const valueSuffix = data.fqdn.replace(/\./g, '-'); // For FQDN, still replace dots with hyphens
       const objectName = `${data.zone}_FQDN_${valueSuffix}`;
       generatedObjectNames.push(objectName);
       downloadFileNamePrefix += `_FQDN_${valueSuffix}`;
@@ -161,7 +161,7 @@ export function NetworkObjectForm() {
       <CardHeader>
         <CardTitle className="text-2xl">Define Network Object</CardTitle>
         <CardDescription>
-          Enter details for your Palo Alto Networks object. The final name will be: ZONE_TYPE_IP/FQDNSuffix (e.g., DMZ_HST_1-1-1-1).
+          Enter details for your Palo Alto Networks object. The final name will be: ZONE_TYPE_IP/FQDNSuffix (e.g., DMZ_HST_1.1.1.1).
         </CardDescription>
       </CardHeader>
       <CardContent>
