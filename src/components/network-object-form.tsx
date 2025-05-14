@@ -3,7 +3,7 @@
 
 import type { NetworkObjectFormData } from '@/lib/schemas';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { networkObjectSchema } from '@/lib/schemas';
 
@@ -13,6 +13,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useToast } from '@/hooks/use-toast';
 import { Download, Loader2 } from 'lucide-react';
 
@@ -23,35 +24,57 @@ export function NetworkObjectForm() {
   const form = useForm<NetworkObjectFormData>({
     resolver: zodResolver(networkObjectSchema),
     defaultValues: {
-      name: '',
-      ipAddress: '',
+      zone: '',
+      baseName: '',
+      objectType: 'host',
+      hostIp: '',
+      // ipRange and fqdn will be undefined initially, which is fine for conditional rendering
       description: '',
       tag: '',
       objectGroup: '',
     },
   });
 
+  const objectType = form.watch('objectType');
+
   const onSubmit = (data: NetworkObjectFormData) => {
     setIsSubmittingConfig(true);
     let configLines: string[] = [];
-    const ipValue = data.ipAddress;
+    let valueSuffix: string = '';
+    let commandValue: string = '';
+    let addressTypeCommand: string = '';
 
-    let ipForNameSuffix: string;
-    if (ipValue.includes('-')) { // Range
-      ipForNameSuffix = ipValue.substring(0, ipValue.indexOf('-'));
-    } else if (ipValue.includes('/')) { // CIDR
-      ipForNameSuffix = ipValue.substring(0, ipValue.indexOf('/'));
-    } else { // Single IP
-      ipForNameSuffix = ipValue;
+    switch (data.objectType) {
+      case 'host':
+        valueSuffix = data.hostIp.replace(/\./g, '-').replace(/:/g, '_'); // Replace : for IPv6 compatibility in names
+        commandValue = data.hostIp;
+        addressTypeCommand = `ip-netmask ${commandValue}`;
+        break;
+      case 'range':
+        valueSuffix = data.ipRange.split('-')[0].replace(/\./g, '-').replace(/:/g, '_');
+        commandValue = data.ipRange;
+        addressTypeCommand = `ip-range ${commandValue}`;
+        break;
+      case 'fqdn':
+        valueSuffix = data.fqdn.replace(/\./g, '-');
+        commandValue = data.fqdn;
+        addressTypeCommand = `fqdn ${commandValue}`;
+        break;
     }
-    const processedIpSuffix = ipForNameSuffix.replace(/\./g, '-');
-    const finalObjectName = `${data.name}_${processedIpSuffix}`;
 
-    if (ipValue.includes('-')) { 
-      configLines.push(`set address ${finalObjectName} ip-range ${ipValue}`);
-    } else { 
-      configLines.push(`set address ${finalObjectName} ip-netmask ${ipValue}`);
+    const finalObjectName = `${data.zone}_${data.baseName}_${valueSuffix}`;
+    
+    // Check final object name length (PAN-OS usually 63 chars for address objects)
+    if (finalObjectName.length > 63) {
+        toast({
+            title: 'Warning: Object Name Too Long',
+            description: `The generated name "${finalObjectName}" (${finalObjectName.length} chars) may exceed firewall limits. Consider shortening zone or base name.`,
+            variant: 'destructive',
+            duration: 7000,
+        });
     }
+
+    configLines.push(`set address ${finalObjectName} ${addressTypeCommand}`);
     
     if (data.description) {
       configLines.push(`set address ${finalObjectName} description "${data.description.replace(/"/g, '\\"')}"`);
@@ -97,7 +120,7 @@ export function NetworkObjectForm() {
       <CardHeader>
         <CardTitle className="text-2xl">Define Network Object</CardTitle>
         <CardDescription>
-          Enter the details for your Palo Alto Networks object. The IP address will be appended to the name.
+          Enter details for your Palo Alto Networks object. The final name will be: Zone_BaseName_IP/FQDNSuffix.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -105,15 +128,30 @@ export function NetworkObjectForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="name"
+              name="zone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Zone</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., dmz, trust, untrust" {...field} />
+                  </FormControl>
+                  <FormDescription>The firewall zone for this object (used in naming).</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="baseName"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Base Object Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., web-server-prod-01" {...field} />
+                    <Input placeholder="e.g., web-server, app-db" {...field} />
                   </FormControl>
                   <FormDescription>
-                    The IP address details will be automatically appended to this name (e.g., name_192-168-1-1).
+                    A descriptive base name. Zone and IP/FQDN details will be appended.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -124,20 +162,94 @@ export function NetworkObjectForm() {
 
             <FormField
               control={form.control}
-              name="ipAddress"
+              name="objectType"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>IP Address / Subnet / Range</FormLabel>
+                <FormItem className="space-y-3">
+                  <FormLabel>Object Type</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., 192.168.1.10, 10.0.0.0/24, or 1.1.1.1-1.1.1.10" {...field} />
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1 md:flex-row md:space-y-0 md:space-x-4"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="host" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Host (Single IP)</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="range" />
+                        </FormControl>
+                        <FormLabel className="font-normal">IP Range</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="fqdn" />
+                        </FormControl>
+                        <FormLabel className="font-normal">FQDN</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
                   </FormControl>
-                  <FormDescription>
-                    Enter an IP address (IPv4/IPv6), CIDR (e.g., 192.168.1.0/24), or IP range (e.g., 192.168.1.10-192.168.1.20).
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {objectType === 'host' && (
+              <FormField
+                control={form.control}
+                name="hostIp"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Host IP Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., 192.168.1.10 or 2001:db8::1" {...field} />
+                    </FormControl>
+                    <FormDescription>Enter a single IPv4 or IPv6 address.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {objectType === 'range' && (
+              <FormField
+                control={form.control}
+                name="ipRange"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>IP Address Range</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., 192.168.1.10-192.168.1.20" {...field} />
+                    </FormControl>
+                    <FormDescription>Enter an IP range (e.g., startIP-endIP).</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {objectType === 'fqdn' && (
+              <FormField
+                control={form.control}
+                name="fqdn"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>FQDN (Fully Qualified Domain Name)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., www.example.com" {...field} />
+                    </FormControl>
+                    <FormDescription>Enter a valid FQDN.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            
+            <Separator />
+
             <FormField
               control={form.control}
               name="description"
