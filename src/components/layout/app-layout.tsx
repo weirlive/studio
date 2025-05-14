@@ -9,7 +9,7 @@ export function AppLayout({ children }: PropsWithChildren) {
       <header className="bg-primary text-primary-foreground shadow-md">
         <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold">PANW Network Object Creator</h1>
+            <h1 className="text-xl font-semibold">WeirLive</h1>
           </Link>
           <nav className="flex items-center gap-4 md:gap-6">
             <Link href="/" className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-1">
