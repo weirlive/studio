@@ -1,37 +1,35 @@
 
 import { AppLayout } from "@/components/layout/app-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Aperture } from "lucide-react";
 
 export default function HomePage() {
   return (
     <AppLayout>
       <div className="flex flex-col items-center justify-center">
-        <Card className="w-full max-w-xl text-center shadow-xl">
+        <Card className="w-full max-w-2xl shadow-xl">
           <CardHeader>
-            <CardTitle className="text-4xl font-bold">Welcome!</CardTitle>
+            <CardTitle className="text-4xl font-bold">Welcome to WeirLive!</CardTitle>
             <CardDescription className="text-lg text-muted-foreground pt-2">
-              This is the PANW Network Object Creator application.
+              Your central hub for network tools.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 text-left">
             <p>
-              Navigate to the "Apps" section to start creating your Palo Alto Networks
-              address objects and configurations.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             </p>
-            <Link href="/apps">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                <Aperture className="mr-2 h-5 w-5" />
-                Go to Network Object Creator
-              </Button>
-            </Link>
-             <div className="mt-8">
-              <p className="text-sm text-muted-foreground">
-                Tip: You can quickly access the tool via the "Apps" link in the header.
-              </p>
-            </div>
+            <p>
+              Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam,
+              eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+              Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
+            </p>
+            <p>
+              Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.
+              Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?
+              Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
+            </p>
           </CardContent>
         </Card>
       </div>
