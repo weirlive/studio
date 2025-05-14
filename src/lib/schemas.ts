@@ -57,11 +57,12 @@ export const networkObjectSchema = z.discriminatedUnion("objectType", [
       .refine(
         (value) => {
           if (!value) return false;
-          const ips = value.split(',').map(ip => ip.trim()).filter(ip => ip.length > 0);
-          if (ips.length === 0) return false;
+          // Split by commas or one or more whitespace characters, then trim and filter empty strings
+          const ips = value.split(/[\s,]+/).map(ip => ip.trim()).filter(ip => ip.length > 0);
+          if (ips.length === 0) return false; // Ensure at least one IP after processing
           return ips.every(ip => isIp(ip));
         },
-        { message: "Invalid IP address format. Please provide a comma-separated list of valid IPv4 or IPv6 addresses (e.g., 1.1.1.1,2.2.2.2)." }
+        { message: "Invalid IP address format. Please provide valid IPv4 or IPv6 addresses, separated by commas or spaces (e.g., 1.1.1.1 2.2.2.2 or 1.1.1.1,2.2.2.2)." }
       ),
   }),
   z.object({

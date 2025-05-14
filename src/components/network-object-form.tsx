@@ -43,7 +43,7 @@ export function NetworkObjectForm() {
     let downloadFileNamePrefix: string = data.zone;
 
     if (data.objectType === 'host') {
-      const ips = data.hostIp.split(',').map(ip => ip.trim()).filter(ip => ip);
+      const ips = data.hostIp.split(/[\s,]+/).map(ip => ip.trim()).filter(ip => ip);
 
       if (ips.length === 0) {
         toast({
@@ -238,9 +238,9 @@ export function NetworkObjectForm() {
                   <FormItem>
                     <FormLabel>Host IP Address(es)</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., 192.168.1.10 or 1.1.1.1,2.2.2.2" {...field} />
+                      <Input placeholder="e.g., 1.1.1.1 or 1.1.1.1,2.2.2.2 3.3.3.3" {...field} />
                     </FormControl>
-                    <FormDescription>Enter a single IPv4/IPv6 address or multiple comma-separated IP addresses.</FormDescription>
+                    <FormDescription>Enter one or more IPv4/IPv6 addresses, separated by commas or spaces.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
