@@ -52,7 +52,17 @@ export const networkObjectSchema = z.discriminatedUnion("objectType", [
   z.object({
     ...baseSchemaFields,
     objectType: z.literal("host"),
-    hostIp: z.string().ip({ message: "Invalid IP address for host. IPv4 or IPv6 allowed." }),
+    hostIp: z.string()
+      .min(1, { message: "At least one IP address is required." })
+      .refine(
+        (value) => {
+          if (!value) return false;
+          const ips = value.split(',').map(ip => ip.trim()).filter(ip => ip.length > 0);
+          if (ips.length === 0) return false;
+          return ips.every(ip => isIp(ip));
+        },
+        { message: "Invalid IP address format. Please provide a comma-separated list of valid IPv4 or IPv6 addresses (e.g., 1.1.1.1,2.2.2.2)." }
+      ),
   }),
   z.object({
     ...baseSchemaFields,

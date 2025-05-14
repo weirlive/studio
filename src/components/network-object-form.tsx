@@ -39,60 +39,102 @@ export function NetworkObjectForm() {
   const onSubmit = (data: NetworkObjectFormData) => {
     setIsSubmittingConfig(true);
     let configLines: string[] = [];
-    let valueSuffix: string = '';
-    let commandValue: string = '';
-    let addressTypeCommand: string = '';
+    const generatedObjectNames: string[] = [];
+    let downloadFileNamePrefix: string = data.zone;
 
-    switch (data.objectType) {
-      case 'host':
-        valueSuffix = data.hostIp.replace(/\./g, '-').replace(/:/g, '_'); // Replace : for IPv6 compatibility in names
-        commandValue = data.hostIp;
-        addressTypeCommand = `ip-netmask ${commandValue}`;
-        break;
-      case 'range':
-        valueSuffix = data.ipRange.split('-')[0].replace(/\./g, '-').replace(/:/g, '_');
-        commandValue = data.ipRange;
-        addressTypeCommand = `ip-range ${commandValue}`;
-        break;
-      case 'fqdn':
-        valueSuffix = data.fqdn.replace(/\./g, '-');
-        commandValue = data.fqdn;
-        addressTypeCommand = `fqdn ${commandValue}`;
-        break;
-    }
+    if (data.objectType === 'host') {
+      const ips = data.hostIp.split(',').map(ip => ip.trim()).filter(ip => ip);
 
-    const finalObjectName = `${data.zone}_${valueSuffix}`;
-    
-    // Check final object name length (PAN-OS usually 63 chars for address objects)
-    if (finalObjectName.length > 63) {
+      if (ips.length === 0) {
         toast({
-            title: 'Warning: Object Name Too Long',
-            description: `The generated name "${finalObjectName}" (${finalObjectName.length} chars) may exceed firewall limits. Consider shortening zone.`,
-            variant: 'destructive',
-            duration: 7000,
+          title: "Input Error",
+          description: "Please provide at least one valid IP address for host type.",
+          variant: "destructive",
         });
+        setIsSubmittingConfig(false);
+        return;
+      }
+
+      downloadFileNamePrefix += `_${ips[0].replace(/\./g, '-').replace(/:/g, '_')}`;
+
+      ips.forEach(ip => {
+        const ipSuffix = ip.replace(/\./g, '-').replace(/:/g, '_');
+        const objectName = `${data.zone}_${ipSuffix}`;
+        generatedObjectNames.push(objectName);
+
+        if (objectName.length > 63) {
+            toast({
+                title: 'Warning: Object Name Too Long',
+                description: `The generated name "${objectName}" (${objectName.length} chars) may exceed firewall limits. Consider shortening zone.`,
+                variant: 'destructive',
+                duration: 7000,
+            });
+        }
+        configLines.push(`set address ${objectName} ip-netmask ${ip}`);
+        if (data.description) {
+          configLines.push(`set address ${objectName} description "${data.description.replace(/"/g, '\\"')}"`);
+        }
+        if (data.tag) {
+          configLines.push(`set address ${objectName} tag ${data.tag}`);
+        }
+      });
+    } else if (data.objectType === 'range' && data.ipRange) {
+      const valueSuffix = data.ipRange.split('-')[0].replace(/\./g, '-').replace(/:/g, '_');
+      const objectName = `${data.zone}_${valueSuffix}`;
+      generatedObjectNames.push(objectName);
+      downloadFileNamePrefix += `_${valueSuffix}`;
+
+      if (objectName.length > 63) {
+          toast({
+              title: 'Warning: Object Name Too Long',
+              description: `The generated name "${objectName}" (${objectName.length} chars) may exceed firewall limits. Consider shortening zone.`,
+              variant: 'destructive',
+              duration: 7000,
+          });
+      }
+      configLines.push(`set address ${objectName} ip-range ${data.ipRange}`);
+      if (data.description) {
+        configLines.push(`set address ${objectName} description "${data.description.replace(/"/g, '\\"')}"`);
+      }
+      if (data.tag) {
+        configLines.push(`set address ${objectName} tag ${data.tag}`);
+      }
+    } else if (data.objectType === 'fqdn' && data.fqdn) {
+      const valueSuffix = data.fqdn.replace(/\./g, '-');
+      const objectName = `${data.zone}_${valueSuffix}`;
+      generatedObjectNames.push(objectName);
+      downloadFileNamePrefix += `_${valueSuffix}`;
+      
+      if (objectName.length > 63) {
+          toast({
+              title: 'Warning: Object Name Too Long',
+              description: `The generated name "${objectName}" (${objectName.length} chars) may exceed firewall limits. Consider shortening zone.`,
+              variant: 'destructive',
+              duration: 7000,
+          });
+      }
+      configLines.push(`set address ${objectName} fqdn ${data.fqdn}`);
+      if (data.description) {
+        configLines.push(`set address ${objectName} description "${data.description.replace(/"/g, '\\"')}"`);
+      }
+      if (data.tag) {
+        configLines.push(`set address ${objectName} tag ${data.tag}`);
+      }
     }
 
-    configLines.push(`set address ${finalObjectName} ${addressTypeCommand}`);
-    
-    if (data.description) {
-      configLines.push(`set address ${finalObjectName} description "${data.description.replace(/"/g, '\\"')}"`);
-    }
-    if (data.tag) {
-      configLines.push(`set address ${finalObjectName} tag ${data.tag}`);
-    }
-    if (data.objectGroup && finalObjectName) {
-      configLines.push(`set address-group ${data.objectGroup} static add [ ${finalObjectName} ]`);
+    if (data.objectGroup && generatedObjectNames.length > 0) {
+      configLines.push(`set address-group ${data.objectGroup} static add [ ${generatedObjectNames.join(' ')} ]`);
     }
 
     const fullConfig = configLines.join('\n');
+    const downloadFileName = `${downloadFileNamePrefix || 'network_objects'}_config.txt`;
     
     try {
       const blob = new Blob([fullConfig], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${finalObjectName || 'network_object'}_config.txt`;
+      link.download = downloadFileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -150,7 +192,13 @@ export function NetworkObjectForm() {
                   <FormLabel>Object Type</FormLabel>
                   <FormControl>
                     <RadioGroup
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        // Clear other fields when object type changes
+                        if (value !== 'host') form.setValue('hostIp', '', {shouldValidate: true});
+                        if (value !== 'range') form.setValue('ipRange', '', {shouldValidate: true});
+                        if (value !== 'fqdn') form.setValue('fqdn', '', {shouldValidate: true});
+                      }}
                       defaultValue={field.value}
                       className="flex flex-col space-y-1 md:flex-row md:space-y-0 md:space-x-4"
                     >
@@ -158,7 +206,7 @@ export function NetworkObjectForm() {
                         <FormControl>
                           <RadioGroupItem value="host" />
                         </FormControl>
-                        <FormLabel className="font-normal">Host (Single IP)</FormLabel>
+                        <FormLabel className="font-normal">Host (Single/Multiple IPs)</FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
@@ -185,11 +233,11 @@ export function NetworkObjectForm() {
                 name="hostIp"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Host IP Address</FormLabel>
+                    <FormLabel>Host IP Address(es)</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., 192.168.1.10 or 2001:db8::1" {...field} />
+                      <Input placeholder="e.g., 192.168.1.10 or 1.1.1.1,2.2.2.2" {...field} />
                     </FormControl>
-                    <FormDescription>Enter a single IPv4 or IPv6 address.</FormDescription>
+                    <FormDescription>Enter a single IPv4/IPv6 address or multiple comma-separated IP addresses.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
