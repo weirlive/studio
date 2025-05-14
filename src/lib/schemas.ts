@@ -1,3 +1,4 @@
+
 import { z } from 'zod';
 
 // Helper function to check if a string is a valid IPv4 or IPv6
@@ -34,10 +35,6 @@ const baseSchemaFields = {
     .min(1, { message: "Zone is required." })
     .max(31, { message: "Zone must be 31 characters or less." })
     .regex(/^[a-zA-Z0-9_-]+$/, { message: "Zone can only contain alphanumeric characters, underscores, and hyphens." }),
-  baseName: z.string()
-    .min(1, { message: "Base Name is required." })
-    .max(31, { message: "Base Name must be 31 characters or less." })
-    .regex(/^[a-zA-Z0-9._-]+$/, { message: "Base Name can only contain alphanumeric characters, underscores, hyphens, and periods." }),
   description: z.string()
     .max(255, { message: "Description must be 255 characters or less." })
     .optional().default(''),

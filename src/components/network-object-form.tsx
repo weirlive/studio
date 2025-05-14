@@ -25,7 +25,6 @@ export function NetworkObjectForm() {
     resolver: zodResolver(networkObjectSchema),
     defaultValues: {
       zone: '',
-      baseName: '',
       objectType: 'host',
       hostIp: '',
       // ipRange and fqdn will be undefined initially, which is fine for conditional rendering
@@ -62,13 +61,13 @@ export function NetworkObjectForm() {
         break;
     }
 
-    const finalObjectName = `${data.zone}_${data.baseName}_${valueSuffix}`;
+    const finalObjectName = `${data.zone}_${valueSuffix}`;
     
     // Check final object name length (PAN-OS usually 63 chars for address objects)
     if (finalObjectName.length > 63) {
         toast({
             title: 'Warning: Object Name Too Long',
-            description: `The generated name "${finalObjectName}" (${finalObjectName.length} chars) may exceed firewall limits. Consider shortening zone or base name.`,
+            description: `The generated name "${finalObjectName}" (${finalObjectName.length} chars) may exceed firewall limits. Consider shortening zone.`,
             variant: 'destructive',
             duration: 7000,
         });
@@ -120,7 +119,7 @@ export function NetworkObjectForm() {
       <CardHeader>
         <CardTitle className="text-2xl">Define Network Object</CardTitle>
         <CardDescription>
-          Enter details for your Palo Alto Networks object. The final name will be: Zone_BaseName_IP/FQDNSuffix.
+          Enter details for your Palo Alto Networks object. The final name will be: Zone_IP/FQDNSuffix.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -136,23 +135,6 @@ export function NetworkObjectForm() {
                     <Input placeholder="e.g., dmz, trust, untrust" {...field} />
                   </FormControl>
                   <FormDescription>The firewall zone for this object (used in naming).</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="baseName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Base Object Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., web-server, app-db" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    A descriptive base name. Zone and IP/FQDN details will be appended.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
