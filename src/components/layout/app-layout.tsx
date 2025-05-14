@@ -21,7 +21,7 @@ export function AppLayout({ children }: PropsWithChildren) {
           {/* Placeholder for potential future nav items or user profile */}
         </div>
       </header>
-      <main className="flex-grow container mx-auto px-4 py-8 md:px-6">
+      <main className="flex-grow container mx-auto px-4 py-12 md:px-6"> {/* Increased py-8 to py-12 */}
         {children}
       </main>
       <footer className="py-6 md:px-6 md:py-0 border-t">
