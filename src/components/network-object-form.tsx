@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { NetworkObjectFormData } from '@/lib/schemas';
@@ -65,17 +66,24 @@ export function NetworkObjectForm() {
   const onSubmit = (data: NetworkObjectFormData) => {
     setIsSubmittingConfig(true);
     let configLines: string[] = [];
+    const ipValue = data.ipAddress;
 
-    configLines.push(`set shared address ${data.name} ip-netmask ${data.ipAddress}`);
+    if (ipValue.includes('-')) { // Validated by Zod to be a proper range if it contains '-'
+      configLines.push(`set address ${data.name} ip-range ${ipValue}`);
+    } else { // Single IP or CIDR
+      configLines.push(`set address ${data.name} ip-netmask ${ipValue}`);
+    }
     
     if (data.description) {
-      configLines.push(`set shared address ${data.name} description "${data.description.replace(/"/g, '\\"')}"`);
+      configLines.push(`set address ${data.name} description "${data.description.replace(/"/g, '\\"')}"`);
     }
     if (data.tag) {
-      configLines.push(`set shared address ${data.name} tag ${data.tag}`);
+      configLines.push(`set address ${data.name} tag ${data.tag}`);
     }
     if (data.objectGroup && data.name) {
-      configLines.push(`set shared address-group ${data.objectGroup} static add [ ${data.name} ]`);
+      // Note: Palo Alto CLI typically requires the group to exist or be created in the same transaction.
+      // This command adds an existing object to an existing group.
+      configLines.push(`set address-group ${data.objectGroup} static add [ ${data.name} ]`);
     }
 
     const fullConfig = configLines.join('\n');
@@ -163,12 +171,12 @@ export function NetworkObjectForm() {
               name="ipAddress"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>IP Address / Subnet</FormLabel>
+                  <FormLabel>IP Address / Subnet / Range</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., 192.168.1.10 or 10.0.0.0/24" {...field} />
+                    <Input placeholder="e.g., 192.168.1.10, 10.0.0.0/24, or 1.1.1.1-1.1.1.10" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Enter an IPv4 or IPv6 address, or a subnet in CIDR notation (e.g., 192.168.1.0/24).
+                    Enter an IP address (IPv4/IPv6), CIDR (e.g., 192.168.1.0/24), or IP range (e.g., 192.168.1.10-192.168.1.20).
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -213,7 +221,7 @@ export function NetworkObjectForm() {
                     <Input placeholder="e.g., Internal-Servers-Group" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Specify an address group to add this object to.
+                    Specify an address group to add this object to. The group must already exist on the firewall.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -222,7 +230,7 @@ export function NetworkObjectForm() {
             <CardFooter className="flex justify-end p-0 pt-6">
               <Button 
                 type="submit" 
-                disabled={isSubmittingConfig} 
+                disabled={isSubmittingConfig || !form.formState.isValid} 
                 className="bg-accent hover:bg-accent/90 text-accent-foreground"
                 size="lg"
               >
